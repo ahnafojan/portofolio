@@ -186,9 +186,15 @@ function CertModal({ cert, onClose }: { cert: Certificate; onClose: () => void }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[120] flex items-end justify-center sm:items-center"
       onClick={onClose}
-      style={{ animation: "certOverlayIn 0.24s ease both" }}
+      style={{
+        animation: "certOverlayIn 0.24s ease both",
+        paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 0.5rem)",
+        paddingLeft: "calc(env(safe-area-inset-left) + 0.5rem)",
+        paddingRight: "calc(env(safe-area-inset-right) + 0.5rem)",
+      }}
     >
       <style>{`
         @keyframes certOverlayIn {
@@ -204,24 +210,47 @@ function CertModal({ cert, onClose }: { cert: Certificate; onClose: () => void }
       <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.9)", backdropFilter: "blur(24px)" }} />
 
       <div
-        className="relative z-10 w-full max-w-5xl overflow-hidden rounded-3xl"
+        className="relative z-10 w-full max-w-5xl overflow-hidden rounded-2xl sm:rounded-3xl"
         onClick={(event) => event.stopPropagation()}
         style={{
+          maxHeight: "calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 1rem)",
           background: "linear-gradient(135deg,#13131e 0%,#0e0e18 100%)",
           border: "1px solid rgba(255,255,255,0.12)",
           animation: "certPanelIn 0.36s cubic-bezier(0.16,1,0.3,1) both",
           boxShadow: "0 40px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
         }}
       >
-        <div className="grid lg:grid-cols-[1.25fr_1fr]">
+        <button
+          type="button"
+          aria-label="Close modal"
+          onClick={onClose}
+          className="absolute right-3 top-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full sm:right-4 sm:top-4"
+          style={{
+            color: "#e5e7eb",
+            background: "rgba(0,0,0,0.58)",
+            border: "1px solid rgba(255,255,255,0.14)",
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M6 6L18 18M18 6L6 18"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        <div className="grid h-full grid-rows-[auto_minmax(0,1fr)] lg:grid-cols-[1.25fr_1fr] lg:grid-rows-1">
           <div className="relative border-b border-white/10 bg-[#080810] lg:border-b-0 lg:border-r">
-            <div className="relative w-full" style={{ aspectRatio: "16/10" }}>
+            <div className="relative h-[28svh] min-h-[190px] w-full sm:h-[32svh] lg:h-full lg:min-h-[460px]">
               <LogoCarousel key={`${cert._id}-modal`} logos={logos} title={cert.title} size="modal" />
             </div>
           </div>
 
-          <div className="max-h-[80vh] overflow-y-auto px-6 pb-6 pt-5 lg:px-7 lg:pb-7 lg:pt-6">
-            <h3 className="text-xl font-bold leading-snug text-white">{cert.title}</h3>
+          <div className="min-h-0 overflow-y-auto px-4 pb-4 pt-4 sm:px-6 sm:pb-6 sm:pt-5 lg:px-7 lg:pb-7 lg:pt-6">
+            <h3 className="pr-12 text-xl font-bold leading-snug text-white">{cert.title}</h3>
             {cert.issuer ? <p className="mt-1.5 text-sm font-medium text-violet-300">{cert.issuer}</p> : null}
 
             <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -277,30 +306,39 @@ function CertModal({ cert, onClose }: { cert: Certificate; onClose: () => void }
               </div>
             ) : null}
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              {cert.credentialUrl ? (
-                <a
-                  href={cert.credentialUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 rounded-xl py-3 text-center text-sm font-medium text-white transition-all duration-200"
-                  style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)" }}
+            <div
+              className="sticky bottom-0 mt-6 -mx-4 px-4 pt-3 sm:-mx-6 sm:px-6 lg:-mx-7 lg:px-7"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(14,14,24,0.98) 0%, rgba(14,14,24,0.92) 60%, rgba(14,14,24,0) 100%)",
+                paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))",
+              }}
+            >
+              <div className="flex flex-col gap-3 sm:flex-row">
+                {cert.credentialUrl ? (
+                  <a
+                    href={cert.credentialUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 rounded-xl py-3 text-center text-sm font-medium text-white transition-all duration-200"
+                    style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)" }}
+                  >
+                    View Credential
+                  </a>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 rounded-xl py-3 text-center text-sm transition-all duration-200"
+                  style={{
+                    color: "#9ca3af",
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
                 >
-                  View Credential
-                </a>
-              ) : null}
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 rounded-xl py-3 text-center text-sm transition-all duration-200"
-                style={{
-                  color: "#9ca3af",
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                Close
-              </button>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
