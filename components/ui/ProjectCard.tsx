@@ -9,6 +9,8 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
+  const previewImage = project.thumbnails?.[0] ?? project.thumbnail;
+
   return (
     <Link
       href={`/projects/${project.slug.current}`}
@@ -16,13 +18,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     >
       {/* Thumbnail */}
       <div className="relative w-full aspect-video bg-zinc-900 overflow-hidden">
-        {project.thumbnail ? (
+        {previewImage ? (
           <Image
-            src={urlFor(project.thumbnail).width(640).height(360).url()}
+            src={urlFor(previewImage).auto("format").fit("crop").width(960).height(540).url()}
             alt={project.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, 50vw"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

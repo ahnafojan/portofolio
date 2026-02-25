@@ -430,16 +430,16 @@ export default function Hero({ profile, skills = [] }: HeroProps) {
               style={{ borderColor: "rgba(255,255,255,0.06)" }}
             >
               <MetricCounter value={skillCount} label="Skills" suffix="+" />
-              <div className="h-9 w-px bg-white/8" />
+              <div className="hidden h-9 w-px bg-white/8 sm:block" />
               <MetricCounter value={socialCount} label="Links" />
-              <div className="h-9 w-px bg-white/8" />
+              <div className="hidden h-9 w-px bg-white/8 sm:block" />
               <MetricCounter value={Math.max(topLevel, 1)} label="Top Level" suffix="/5" />
             </div>
           </div>
 
-          <div className="relative h-[520px] w-full sm:h-[580px] lg:h-[620px]">
+          <div className="relative h-[440px] w-full sm:h-[560px] lg:h-[620px]">
             <div
-              className="absolute inset-0 overflow-hidden rounded-[2rem] border"
+              className="absolute inset-0 flex flex-col overflow-hidden rounded-[2rem] border"
               style={{
                 borderColor: "rgba(255,255,255,0.08)",
                 background: "linear-gradient(160deg,rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.015) 100%)",
@@ -448,13 +448,13 @@ export default function Hero({ profile, skills = [] }: HeroProps) {
               }}
             >
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
-              <div className="relative z-20 flex items-center justify-between px-5 pt-4">
+              <div className="relative z-20 flex flex-wrap items-center justify-between gap-2 px-4 pt-3 sm:px-5 sm:pt-4">
                 <div>
                   <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-zinc-500">Skill Galaxy</p>
                   <p className="text-sm text-zinc-200">Interactive stack map</p>
                 </div>
                 <span
-                  className="rounded-full px-3 py-1 text-[10px] font-mono uppercase tracking-[0.12em]"
+                  className="rounded-full px-2.5 py-1 text-[9px] font-mono uppercase tracking-[0.12em] sm:px-3 sm:text-[10px]"
                   style={{
                     color: "#a78bfa",
                     background: "rgba(124,58,237,0.18)",
@@ -465,7 +465,7 @@ export default function Hero({ profile, skills = [] }: HeroProps) {
                 </span>
               </div>
 
-              <div className="relative h-[calc(100%-3.6rem)]">
+              <div className="relative min-h-0 flex-1 pt-2">
                 <SolarSystem
                   profile={profile}
                   skills={curatedSkills}

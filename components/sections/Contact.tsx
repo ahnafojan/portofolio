@@ -166,8 +166,8 @@ export default function Contact({ profile }: ContactProps) {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-20 rounded-b-full pointer-events-none"
             style={{ background: "rgba(124,58,237,0.1)", filter: "blur(24px)" }} />
 
-          <div className="relative p-10 lg:p-14">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10">
+          <div className="relative p-6 sm:p-8 lg:p-14">
+            <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center lg:gap-10">
 
               {/* Left text */}
               <div className="flex flex-col gap-4 max-w-md">
@@ -203,7 +203,7 @@ export default function Contact({ profile }: ContactProps) {
               </div>
 
               {/* Right links */}
-              <div className="flex flex-col gap-3 w-full lg:w-72 shrink-0">
+              <div className="flex w-full flex-col gap-3 lg:w-72 lg:shrink-0">
                 {socials.length > 0 ? (
                   socials.map(s => (
                     <SocialLink key={s.key} href={s.href!} label={s.label} icon={s.icon} />
@@ -219,7 +219,7 @@ export default function Contact({ profile }: ContactProps) {
         {/* Footer */}
         <div
           data-anim
-          className="mt-14 flex flex-col sm:flex-row items-center justify-between gap-4"
+          className="mt-14 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between"
           style={{ opacity: 0, transform: "translateY(10px)", transition: "opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s" }}
         >
           <p className="text-xs font-mono" style={{ color: "#1f2937" }}>

@@ -16,6 +16,20 @@ function getCertificateLogos(cert: Certificate): SanityImage[] {
   return [];
 }
 
+function sanitizeIssuer(value?: string) {
+  return (
+    value
+      ?.normalize("NFKC")
+      .replace(/[\u200B-\u200D\uFEFF]/g, "")
+      .replace(/\s+/g, " ")
+      .trim() ?? ""
+  );
+}
+
+function normalizeIssuer(value?: string) {
+  return sanitizeIssuer(value).toLowerCase();
+}
+
 function LogoCarousel({
   logos,
   title,
@@ -29,10 +43,6 @@ function LogoCarousel({
   const touchStartX = useRef<number | null>(null);
   const hasMultiple = logos.length > 1;
   const isModal = size === "modal";
-
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [logos.length]);
 
   const prev = () => {
     setActiveIndex((current) => (current - 1 + logos.length) % logos.length);
@@ -58,6 +68,7 @@ function LogoCarousel({
 
   return (
     <div
+      data-cert-logo-carousel="true"
       className="absolute inset-0 overflow-hidden"
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0]?.clientX ?? null;
@@ -205,7 +216,7 @@ function CertModal({ cert, onClose }: { cert: Certificate; onClose: () => void }
         <div className="grid lg:grid-cols-[1.25fr_1fr]">
           <div className="relative border-b border-white/10 bg-[#080810] lg:border-b-0 lg:border-r">
             <div className="relative w-full" style={{ aspectRatio: "16/10" }}>
-              <LogoCarousel logos={logos} title={cert.title} size="modal" />
+              <LogoCarousel key={`${cert._id}-modal`} logos={logos} title={cert.title} size="modal" />
             </div>
           </div>
 
@@ -213,7 +224,7 @@ function CertModal({ cert, onClose }: { cert: Certificate; onClose: () => void }
             <h3 className="text-xl font-bold leading-snug text-white">{cert.title}</h3>
             {cert.issuer ? <p className="mt-1.5 text-sm font-medium text-violet-300">{cert.issuer}</p> : null}
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {[
                 { label: "Issued", value: formatMonthYear(cert.issueDate) || "-" },
                 { label: "Expires", value: cert.expiryDate ? formatMonthYear(cert.expiryDate) : "No expiry" },
@@ -266,7 +277,7 @@ function CertModal({ cert, onClose }: { cert: Certificate; onClose: () => void }
               </div>
             ) : null}
 
-            <div className="mt-6 flex gap-3">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               {cert.credentialUrl ? (
                 <a
                   href={cert.credentialUrl}
@@ -298,7 +309,17 @@ function CertModal({ cert, onClose }: { cert: Certificate; onClose: () => void }
   );
 }
 
-function CertCard({ cert, onClick, index }: { cert: Certificate; onClick: () => void; index: number }) {
+function CertCard({
+  cert,
+  onClick,
+  index,
+  revealed,
+}: {
+  cert: Certificate;
+  onClick: () => void;
+  index: number;
+  revealed: boolean;
+}) {
   const logos = useMemo(() => getCertificateLogos(cert), [cert]);
   const [hovered, setHovered] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -323,7 +344,6 @@ function CertCard({ cert, onClick, index }: { cert: Certificate; onClick: () => 
   return (
     <div
       ref={cardRef}
-      data-anim
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => {
@@ -331,10 +351,10 @@ function CertCard({ cert, onClick, index }: { cert: Certificate; onClick: () => 
         setTilt({ x: 0, y: 0 });
       }}
       onMouseMove={handleMouseMove}
-      className="relative cursor-pointer select-none overflow-hidden rounded-2xl"
+      className="relative w-full cursor-pointer select-none overflow-hidden rounded-2xl"
       style={{
-        opacity: 0,
-        transform: cardTransform,
+        opacity: revealed ? 1 : 0,
+        transform: revealed ? cardTransform : "translateY(28px)",
         transition: cardTransition,
         boxShadow: hovered ? "0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(167,139,250,0.15)" : "none",
         background: hovered ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.025)",
@@ -350,7 +370,7 @@ function CertCard({ cert, onClick, index }: { cert: Certificate; onClick: () => 
         }}
       />
 
-      <div className="relative w-full overflow-hidden" style={{ background: "#07070f", aspectRatio: "16/9" }}>
+      <div className="relative w-full overflow-hidden aspect-[16/10] sm:aspect-video" style={{ background: "#07070f" }}>
         <LogoCarousel logos={logos} title={cert.title} size="card" />
 
         {cert.issueDate ? (
@@ -368,8 +388,8 @@ function CertCard({ cert, onClick, index }: { cert: Certificate; onClick: () => 
         ) : null}
       </div>
 
-      <div className="p-5">
-        <p className="line-clamp-2 text-sm font-semibold leading-snug text-white">{cert.title}</p>
+      <div className="p-4 sm:p-5">
+        <p className="line-clamp-2 text-sm font-semibold leading-snug text-white sm:text-[15px]">{cert.title}</p>
         {cert.issuer ? <p className="mt-1.5 text-xs font-medium text-violet-300/80">{cert.issuer}</p> : null}
 
         {cert.skills?.length ? (
@@ -414,20 +434,99 @@ function CertCard({ cert, onClick, index }: { cert: Certificate; onClick: () => 
 
 export default function Certificates({ items }: { items: Certificate[] }) {
   const [selected, setSelected] = useState<Certificate | null>(null);
-  const [filter, setFilter] = useState<string>("All");
+  const [filter, setFilter] = useState<string>("all");
+  const [revealed, setRevealed] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  const pageTouchStartX = useRef<number | null>(null);
+  const pageTouchStartY = useRef<number | null>(null);
 
-  const issuers = ["All", ...Array.from(new Set(items.map((item) => item.issuer).filter(Boolean) as string[]))].slice(
-    0,
-    6
+  const issuerGroups = useMemo(() => {
+    const groups = new Map<string, { key: string; label: string; items: Certificate[] }>();
+
+    items.forEach((item) => {
+      const label = sanitizeIssuer(item.issuer);
+      const key = normalizeIssuer(label);
+      if (!key || !label) return;
+
+      const existing = groups.get(key);
+      if (existing) {
+        existing.items.push(item);
+        return;
+      }
+
+      groups.set(key, { key, label, items: [item] });
+    });
+
+    return [{ key: "all", label: "All", items }, ...Array.from(groups.values())];
+  }, [items]);
+
+  const activeFilter = issuerGroups.some((group) => group.key === filter) ? filter : "all";
+  const filtered = useMemo(
+    () =>
+      activeFilter === "all"
+        ? items
+        : issuerGroups.find((group) => group.key === activeFilter)?.items ?? [],
+    [activeFilter, issuerGroups, items]
   );
-  const filtered = filter === "All" ? items : items.filter((item) => item.issuer === filter);
+  const cardsPerPage = 6;
+  const pages = useMemo(() => {
+    const chunks: Certificate[][] = [];
+    for (let index = 0; index < filtered.length; index += cardsPerPage) {
+      chunks.push(filtered.slice(index, index + cardsPerPage));
+    }
+    return chunks;
+  }, [filtered]);
+  const totalPages = pages.length;
+  const safePage = totalPages > 0 ? Math.min(currentPage, totalPages - 1) : 0;
+  const canSwipePages = activeFilter === "all" && totalPages > 1;
+
+  const handlePageTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!canSwipePages) return;
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('[data-cert-logo-carousel="true"]')) {
+      pageTouchStartX.current = null;
+      pageTouchStartY.current = null;
+      return;
+    }
+
+    pageTouchStartX.current = event.touches[0]?.clientX ?? null;
+    pageTouchStartY.current = event.touches[0]?.clientY ?? null;
+  };
+
+  const handlePageTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!canSwipePages || pageTouchStartX.current === null || pageTouchStartY.current === null) return;
+
+    const endX = event.changedTouches[0]?.clientX ?? pageTouchStartX.current;
+    const endY = event.changedTouches[0]?.clientY ?? pageTouchStartY.current;
+    const deltaX = endX - pageTouchStartX.current;
+    const deltaY = endY - pageTouchStartY.current;
+
+    pageTouchStartX.current = null;
+    pageTouchStartY.current = null;
+
+    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+    if (deltaX < 0) {
+      setCurrentPage((page) => Math.min(totalPages - 1, page + 1));
+      return;
+    }
+
+    setCurrentPage((page) => Math.max(0, page - 1));
+  };
+
+  const handlePageTouchCancel = () => {
+    pageTouchStartX.current = null;
+    pageTouchStartY.current = null;
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            setRevealed(true);
             const elements = entry.target.querySelectorAll<HTMLElement>("[data-anim]");
             elements.forEach((element, index) => {
               setTimeout(() => {
@@ -486,7 +585,7 @@ export default function Certificates({ items }: { items: Certificate[] }) {
                 Credentials
               </p>
             </div>
-            <div className="mb-8 flex items-end justify-between">
+            <div className="mb-8 flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between">
               <h2 className="text-3xl font-bold text-white lg:text-4xl">Certificates</h2>
               <span
                 className="rounded-full px-3 py-1.5 text-xs font-mono"
@@ -497,35 +596,163 @@ export default function Certificates({ items }: { items: Certificate[] }) {
             </div>
           </div>
 
-          {issuers.length > 2 ? (
+          {issuerGroups.length > 2 ? (
             <div
               data-anim
               className="mb-8 flex flex-wrap gap-2"
               style={{ opacity: 0, transform: "translateY(12px)", transition: "opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s" }}
             >
-              {issuers.map((issuer) => (
+              {issuerGroups.map((group) => (
                 <button
-                  key={issuer}
+                  key={group.key}
                   type="button"
-                  onClick={() => setFilter(issuer)}
+                  onClick={() => {
+                    setFilter(group.key);
+                    setCurrentPage(0);
+                  }}
                   className="rounded-full px-4 py-1.5 text-xs font-mono transition-all duration-200"
                   style={
-                    filter === issuer
+                    activeFilter === group.key
                       ? { color: "#e2d9f3", background: "rgba(124,58,237,0.25)", border: "1px solid rgba(124,58,237,0.4)" }
                       : { color: "#4b5563", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }
                   }
                 >
-                  {issuer}
+                  {group.label}
                 </button>
               ))}
             </div>
           ) : null}
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((certificate, index) => (
-              <CertCard key={certificate._id} cert={certificate} index={index} onClick={() => setSelected(certificate)} />
-            ))}
-          </div>
+          {filtered.length > 0 ? (
+            <div className="space-y-4">
+              <div
+                className="overflow-hidden"
+                onTouchStart={handlePageTouchStart}
+                onTouchEnd={handlePageTouchEnd}
+                onTouchCancel={handlePageTouchCancel}
+              >
+                <div
+                  className="flex transition-transform duration-500 ease-out"
+                  style={{ transform: `translateX(-${safePage * 100}%)` }}
+                >
+                  {pages.map((pageItems, pageIndex) => (
+                    <div key={`certificate-page-${pageIndex}`} className="w-full shrink-0">
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+                        {pageItems.map((certificate, index) => (
+                          <CertCard
+                            key={certificate._id}
+                            cert={certificate}
+                            index={index}
+                            revealed={revealed}
+                            onClick={() => setSelected(certificate)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {activeFilter === "all" && totalPages > 1 ? (
+                <div
+                  className="flex flex-col gap-3 rounded-2xl border px-4 py-3"
+                  style={{
+                    borderColor: "rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.02)",
+                  }}
+                >
+                  <p className="text-center text-xs font-mono uppercase tracking-[0.12em] text-zinc-500 sm:text-left">
+                    Page {safePage + 1} / {totalPages}
+                  </p>
+
+                  <div className="flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((page) => Math.max(0, Math.min(page, safePage) - 1))}
+                      disabled={safePage === 0}
+                      aria-label="Previous certificate page"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 disabled:cursor-not-allowed"
+                      style={{
+                        color: safePage === 0 ? "#52525b" : "#d4d4d8",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path
+                          d="M15 6L9 12L15 18"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      {pages.map((_unused, pageIndex) => (
+                        <button
+                          key={`certificate-page-dot-${pageIndex}`}
+                          type="button"
+                          aria-label={`Go to certificate page ${pageIndex + 1}`}
+                          onClick={() => setCurrentPage(pageIndex)}
+                          className="h-2 rounded-full transition-all duration-300"
+                          style={{
+                            width: safePage === pageIndex ? "18px" : "8px",
+                            background:
+                              safePage === pageIndex
+                                ? "rgba(167,139,250,0.95)"
+                                : "rgba(255,255,255,0.3)",
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCurrentPage((page) => Math.min(totalPages - 1, Math.max(page, safePage) + 1))
+                      }
+                      disabled={safePage >= totalPages - 1}
+                      aria-label="Next certificate page"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 disabled:cursor-not-allowed"
+                      style={{
+                        color: safePage >= totalPages - 1 ? "#52525b" : "#ede9fe",
+                        background:
+                          safePage >= totalPages - 1
+                            ? "rgba(255,255,255,0.04)"
+                            : "rgba(124,58,237,0.24)",
+                        border:
+                          safePage >= totalPages - 1
+                            ? "1px solid rgba(255,255,255,0.1)"
+                            : "1px solid rgba(124,58,237,0.45)",
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path
+                          d="M9 6L15 12L9 18"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div
+              className="rounded-2xl border px-6 py-10 text-center"
+              style={{
+                borderColor: "rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.02)",
+              }}
+            >
+              <p className="text-sm text-zinc-400">No certificates found for this issuer.</p>
+            </div>
+          )}
         </div>
       </section>
 

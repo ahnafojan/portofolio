@@ -57,7 +57,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         {/* Header */}
         <div
           data-anim
-          className="flex items-end justify-between mb-12"
+          className="mb-12 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between"
           style={{ opacity: 0, transform: "translateY(24px)", transition: "opacity 0.6s ease, transform 0.6s ease" }}
         >
           <div>
@@ -72,7 +72,7 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
             href="/projects"
             onMouseEnter={() => setHoveredLink(true)}
             onMouseLeave={() => setHoveredLink(false)}
-            className="group flex items-center gap-2.5 text-sm rounded-full px-5 py-2.5 transition-all duration-300"
+            className="group inline-flex items-center gap-2.5 rounded-full px-5 py-2.5 text-sm transition-all duration-300"
             style={{
               color: hoveredLink ? "#e2d9f3" : "#6b7280",
               background: hoveredLink ? "rgba(124,58,237,0.12)" : "rgba(255,255,255,0.04)",

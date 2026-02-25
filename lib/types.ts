@@ -32,6 +32,7 @@ export interface Project {
   title: string;
   slug: { current: string };
   summary?: string;
+  thumbnails?: SanityImage[];
   thumbnail?: SanityImage;
   techStack?: string[];
   demoUrl?: string;

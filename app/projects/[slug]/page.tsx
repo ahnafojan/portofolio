@@ -1,12 +1,11 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
-import { client, hasSanityConfig, urlFor } from "@/lib/sanity";
+import { client, hasSanityConfig } from "@/lib/sanity";
 import { projectBySlugQuery, allProjectsQuery } from "@/lib/queries";
 import { Project } from "@/lib/types";
-import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import ProjectImageCarousel from "@/components/ui/ProjectImageCarousel";
 
 export const revalidate = 60;
 
@@ -48,6 +47,14 @@ export default async function ProjectDetailPage({ params }: Params) {
 
   const techStack = project.techStack ?? [];
   const summary = project.summary ?? "No summary is available for this project yet.";
+  const mobileVisibleStackCount = 8;
+  const visibleTechStack = techStack.slice(0, mobileVisibleStackCount);
+  const hiddenTechStack = techStack.slice(mobileVisibleStackCount);
+  const galleryImages = project.thumbnails && project.thumbnails.length > 0
+    ? project.thumbnails
+    : project.thumbnail
+      ? [project.thumbnail]
+      : [];
 
   return (
     <main
@@ -196,7 +203,7 @@ export default async function ProjectDetailPage({ params }: Params) {
         </section>
 
         <section className="mt-8">
-          {project.thumbnail ? (
+          {galleryImages.length > 0 ? (
             <div
               className="relative overflow-hidden rounded-3xl border"
               style={{
@@ -206,16 +213,9 @@ export default async function ProjectDetailPage({ params }: Params) {
               }}
             >
               <div className="absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-violet-400/60 to-transparent" />
-              <div className="relative aspect-video w-full">
-                <Image
-                  src={urlFor(project.thumbnail).width(1400).height(788).url()}
-                  alt={project.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 1200px"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+              <div className="relative w-full">
+                <ProjectImageCarousel images={galleryImages} title={project.title} />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
               </div>
             </div>
           ) : (
@@ -231,34 +231,94 @@ export default async function ProjectDetailPage({ params }: Params) {
           )}
         </section>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+        <section className="mt-8">
           <div
-            className="rounded-3xl border p-6 lg:p-8"
+            className="rounded-3xl border p-5 sm:p-6 lg:p-8"
             style={{
               borderColor: "rgba(255,255,255,0.08)",
               background: "rgba(255,255,255,0.02)",
               backdropFilter: "blur(10px)",
             }}
           >
-            <p className="text-xs font-mono uppercase tracking-[0.25em] text-violet-400">Overview</p>
-            <p className="mt-4 text-sm leading-relaxed text-zinc-400 lg:text-base">{summary}</p>
-          </div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs font-mono uppercase tracking-[0.25em] text-violet-400">Tech Stack</p>
+              <span
+                className="w-fit rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.12em]"
+                style={{
+                  color: "#a1a1aa",
+                  background: "rgba(255,255,255,0.035)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                {techStack.length} item{techStack.length !== 1 ? "s" : ""}
+              </span>
+            </div>
 
-          <div
-            className="rounded-3xl border p-6"
-            style={{
-              borderColor: "rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.02)",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            <p className="text-xs font-mono uppercase tracking-[0.25em] text-violet-400">Tech Stack</p>
             {techStack.length > 0 ? (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {techStack.map((tech) => (
-                  <Badge key={tech} label={tech} variant="accent" />
-                ))}
-              </div>
+              <>
+                <div className="mt-4 flex flex-wrap gap-2 sm:hidden">
+                  {visibleTechStack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="rounded-full px-2 py-0.5 text-[10px] font-mono"
+                      style={{
+                        color: "#c4b5fd",
+                        background: "rgba(124,58,237,0.1)",
+                        border: "1px solid rgba(124,58,237,0.3)",
+                      }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                {hiddenTechStack.length > 0 ? (
+                  <details className="group mt-2 sm:hidden">
+                    <summary
+                      className="inline-flex cursor-pointer list-none items-center rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.1em]"
+                      style={{
+                        color: "#d4d4d8",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                      }}
+                    >
+                      <span className="group-open:hidden">Show more</span>
+                      <span className="hidden group-open:inline">Show less</span>
+                    </summary>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {hiddenTechStack.map((tech) => (
+                        <span
+                          key={`hidden-${tech}`}
+                          className="rounded-full px-2 py-0.5 text-[10px] font-mono"
+                          style={{
+                            color: "#c4b5fd",
+                            background: "rgba(124,58,237,0.1)",
+                            border: "1px solid rgba(124,58,237,0.3)",
+                          }}
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </details>
+                ) : null}
+
+                <div className="mt-4 hidden flex-wrap gap-2.5 sm:flex">
+                  {techStack.map((tech) => (
+                    <span
+                      key={`desktop-${tech}`}
+                      className="rounded-full px-2.5 py-1 text-xs font-mono"
+                      style={{
+                        color: "#c4b5fd",
+                        background: "rgba(124,58,237,0.1)",
+                        border: "1px solid rgba(124,58,237,0.3)",
+                      }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </>
             ) : (
               <p className="mt-4 text-sm text-zinc-500">No stack information provided.</p>
             )}

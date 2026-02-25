@@ -15,8 +15,21 @@ export default defineType({
     }),
     defineField({ name: "summary", title: "Summary", type: "text" }),
     defineField({
+      name: "thumbnails",
+      title: "Thumbnails",
+      description: "Bisa upload lebih dari satu gambar project untuk ditampilkan sebagai slider.",
+      type: "array",
+      of: [
+        {
+          type: "image",
+          options: { hotspot: true },
+        },
+      ],
+    }),
+    defineField({
       name: "thumbnail",
-      title: "Thumbnail",
+      title: "Legacy Thumbnail (Single)",
+      description: "Field lama. Gunakan Thumbnails untuk input baru.",
       type: "image",
       options: { hotspot: true },
     }),

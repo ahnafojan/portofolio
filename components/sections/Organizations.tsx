@@ -208,7 +208,7 @@ export default function Organizations({ items }: { items: Organization[] }) {
             <div className="h-px w-8" style={{ background: "rgba(124,58,237,0.7)" }} />
             <p className="text-xs font-mono tracking-[0.25em] uppercase" style={{ color: "#7c3aed" }}>Involvement</p>
           </div>
-          <div className="flex items-end justify-between mb-10">
+          <div className="mb-10 flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between">
             <h2 className="text-3xl lg:text-4xl font-bold text-white">
               Organizations &amp;<br className="sm:hidden" /> Committees
             </h2>

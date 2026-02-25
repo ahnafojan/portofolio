@@ -584,7 +584,7 @@ export default function SolarSystem({
       </div>
 
       <div
-        className="pointer-events-none absolute left-4 top-4 z-20 w-52 rounded-xl p-3"
+        className="pointer-events-none absolute left-3 top-3 z-20 w-[min(15rem,calc(100%-1.5rem))] rounded-xl p-3 sm:left-4 sm:top-4 sm:w-52"
         style={{
           background: "rgba(8,8,16,0.64)",
           border: "1px solid rgba(255,255,255,0.08)",
@@ -607,12 +607,12 @@ export default function SolarSystem({
         </div>
       </div>
 
-      <div className="absolute right-4 top-4 z-20 flex flex-col gap-2">
+      <div className="absolute bottom-3 left-1/2 z-20 flex w-[calc(100%-1.5rem)] max-w-[21rem] -translate-x-1/2 flex-wrap items-center justify-center gap-2 sm:bottom-auto sm:left-auto sm:right-4 sm:top-4 sm:w-auto sm:max-w-none sm:translate-x-0 sm:flex-col sm:items-stretch">
         <button
           type="button"
           onPointerDown={(event) => event.stopPropagation()}
           onClick={() => setIsPaused((current) => !current)}
-          className="rounded-full px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.12em]"
+          className="rounded-full px-3.5 py-2 text-[10px] font-mono uppercase leading-none tracking-[0.12em]"
           style={controlButtonStyle}
         >
           {isPaused ? "Resume" : "Pause"}
@@ -622,14 +622,14 @@ export default function SolarSystem({
           type="button"
           onPointerDown={(event) => event.stopPropagation()}
           onClick={handleResetView}
-          className="rounded-full px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.12em]"
+          className="rounded-full px-3.5 py-2 text-[10px] font-mono uppercase leading-none tracking-[0.12em]"
           style={controlButtonStyle}
         >
           Reset View
         </button>
 
         <div
-          className="rounded-full px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.12em]"
+          className="min-w-[88px] rounded-full px-3.5 py-2 text-center text-[10px] font-mono uppercase leading-none tracking-[0.12em]"
           style={{
             color: "#94a3b8",
             background: "rgba(8,8,16,0.64)",
@@ -643,7 +643,7 @@ export default function SolarSystem({
 
       {showHint ? (
         <div
-          className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full px-4 py-2 text-[10px] font-mono uppercase tracking-[0.12em]"
+          className="pointer-events-none absolute bottom-16 left-1/2 z-20 w-[calc(100%-1.5rem)] max-w-md -translate-x-1/2 rounded-2xl px-4 py-2 text-center text-[10px] font-mono uppercase tracking-[0.12em] sm:bottom-4 sm:w-auto sm:rounded-full"
           style={{
             color: "#9ca3af",
             background: "rgba(8,8,16,0.65)",

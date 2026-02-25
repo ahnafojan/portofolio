@@ -101,7 +101,7 @@ function ExperienceCard({ exp, index }: { exp: ExperienceType; index: number }) 
                 <p className="text-sm font-medium" style={{ color: "#7c3aed" }}>@ {exp.company}</p>
               </div>
 
-              <div className="flex flex-col items-end gap-1 shrink-0">
+              <div className="flex w-full flex-col items-start gap-1 sm:w-auto sm:shrink-0 sm:items-end">
                 <p className="text-xs font-mono" style={{ color: "#4b5563" }}>
                   {formatDate(exp.startDate)} — {exp.isCurrent ? "Present" : formatDate(exp.endDate)}
                 </p>
@@ -200,7 +200,7 @@ export default function Experience({ experiences }: ExperienceProps) {
             <div className="h-px w-8" style={{ background: "rgba(124,58,237,0.7)" }} />
             <p className="text-xs font-mono tracking-[0.25em] uppercase" style={{ color: "#7c3aed" }}>Career</p>
           </div>
-          <div className="flex items-end justify-between mb-14">
+          <div className="mb-14 flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between">
             <h2 className="text-3xl lg:text-4xl font-bold text-white">Experience</h2>
             <span className="text-xs font-mono px-3 py-1.5 rounded-full"
               style={{ color: "#6b7280", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>

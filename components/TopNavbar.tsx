@@ -87,7 +87,7 @@ export default function TopNavbar() {
   return (
     <div className={navClass}>
       <nav
-        className="mx-auto flex items-center justify-between gap-3 overflow-hidden rounded-full px-3 py-2"
+        className="mx-auto flex items-center justify-between gap-2 overflow-hidden rounded-full px-2.5 py-1.5 sm:gap-3 sm:px-3 sm:py-2"
         style={{
           background: scrolled ? "rgba(8,8,16,0.86)" : "rgba(8,8,16,0.62)",
           border: "1px solid rgba(255,255,255,0.1)",
@@ -100,7 +100,7 @@ export default function TopNavbar() {
         <a
           href="#about"
           onClick={() => setActiveId("about")}
-          className="shrink-0 rounded-full px-3 py-1.5 text-xs font-mono uppercase tracking-[0.18em]"
+          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.14em] sm:px-3 sm:py-1.5 sm:text-xs sm:tracking-[0.18em]"
           style={{
             color: "#ddd6fe",
             background: "rgba(124,58,237,0.2)",
@@ -110,7 +110,7 @@ export default function TopNavbar() {
           Portfolio
         </a>
 
-        <div className="flex flex-1 items-center gap-1 overflow-x-auto px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex flex-1 items-center gap-0.5 overflow-x-auto px-1 sm:gap-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {NAV_ITEMS.map((item) => {
             const isActive = activeId === item.id;
             const itemStyle = {
@@ -125,7 +125,7 @@ export default function TopNavbar() {
                   key={item.id}
                   href={item.href}
                   onClick={() => setActiveId(item.id)}
-                  className="whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.12em] transition-all duration-250"
+                  className="whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.1em] transition-all duration-250 sm:px-3 sm:py-1.5 sm:text-[11px] sm:tracking-[0.12em]"
                   style={itemStyle}
                 >
                   {item.label}
@@ -138,7 +138,7 @@ export default function TopNavbar() {
                 key={item.id}
                 href={item.href}
                 onClick={() => setActiveId(item.id)}
-                className="whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.12em] transition-all duration-250"
+                className="whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.1em] transition-all duration-250 sm:px-3 sm:py-1.5 sm:text-[11px] sm:tracking-[0.12em]"
                 style={itemStyle}
               >
                 {item.label}

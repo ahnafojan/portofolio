@@ -261,9 +261,9 @@ export default function Skills({ skills }: SkillsProps) {
             <div className="h-px w-8" style={{ background: "rgba(124,58,237,0.7)" }} />
             <p className="text-xs font-mono tracking-[0.25em] uppercase" style={{ color: "#7c3aed" }}>Expertise</p>
           </div>
-          <div className="flex items-end justify-between mb-4">
+          <div className="mb-4 flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between">
             <h2 className="text-3xl lg:text-4xl font-bold text-white">Skills &amp; Tools</h2>
-            <span className="text-xs font-mono px-3 py-1.5 rounded-full"
+            <span className="rounded-full px-3 py-1.5 text-xs font-mono"
               style={{ color: "#6b7280", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
               {skills.length} technologies
             </span>
