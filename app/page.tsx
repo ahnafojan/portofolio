@@ -1,4 +1,4 @@
-import { client } from "@/lib/sanity";
+import { client, hasSanityConfig } from "@/lib/sanity";
 import {
   profileQuery,
   featuredProjectsQuery,
@@ -28,6 +28,19 @@ import TopNavbar from "@/components/TopNavbar";
 export const revalidate = 60;
 
 export default async function Home() {
+  if (!hasSanityConfig || !client) {
+    return (
+      <main className="min-h-screen bg-[#080808] text-white">
+        <TopNavbar />
+        <FeaturedProjects projects={[]} />
+        <Skills skills={[]} />
+        <Experience experiences={[]} />
+        <Organizations items={[]} />
+        <Certificates items={[]} />
+      </main>
+    );
+  }
+
   const [
     profile,
     featuredProjects,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { client } from "@/lib/sanity";
+import { client, hasSanityConfig } from "@/lib/sanity";
 import { allProjectsQuery } from "@/lib/queries";
 import { Project } from "@/lib/types";
 import ProjectCard from "@/components/ui/ProjectCard";
@@ -12,7 +12,9 @@ export const metadata = {
 };
 
 export default async function ProjectsPage() {
-  const projects = await client.fetch<Project[]>(allProjectsQuery);
+  const projects = hasSanityConfig && client
+    ? await client.fetch<Project[]>(allProjectsQuery)
+    : [];
   const totalProjects = projects?.length ?? 0;
   const featuredProjects = projects?.filter((project) => project.featured).length ?? 0;
   const projectsWithDemo = projects?.filter((project) => Boolean(project.demoUrl)).length ?? 0;

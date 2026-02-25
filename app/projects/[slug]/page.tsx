@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
-import { client, urlFor } from "@/lib/sanity";
+import { client, hasSanityConfig, urlFor } from "@/lib/sanity";
 import { projectBySlugQuery, allProjectsQuery } from "@/lib/queries";
 import { Project } from "@/lib/types";
 import Badge from "@/components/ui/Badge";
@@ -15,11 +15,20 @@ interface Params {
 }
 
 export async function generateStaticParams() {
+  if (!hasSanityConfig || !client) return [];
+
   const projects = await client.fetch<Project[]>(allProjectsQuery);
   return (projects ?? []).map((project) => ({ slug: project.slug.current }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  if (!hasSanityConfig || !client) {
+    return {
+      title: "Project",
+      description: "",
+    };
+  }
+
   const { slug } = await params;
   const project = await client.fetch<Project>(projectBySlugQuery, { slug });
 
@@ -30,6 +39,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function ProjectDetailPage({ params }: Params) {
+  if (!hasSanityConfig || !client) notFound();
+
   const { slug } = await params;
   const project = await client.fetch<Project>(projectBySlugQuery, { slug });
 
