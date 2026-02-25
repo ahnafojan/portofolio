@@ -16,12 +16,13 @@ interface Params {
 
 export async function generateStaticParams() {
   const projects = await client.fetch<Project[]>(allProjectsQuery);
-  return (projects ?? []).map((p) => ({ slug: p.slug.current }));
+  return (projects ?? []).map((project) => ({ slug: project.slug.current }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const project = await client.fetch<Project>(projectBySlugQuery, { slug });
+
   return {
     title: project?.title ?? "Project",
     description: project?.summary ?? "",
@@ -34,85 +35,224 @@ export default async function ProjectDetailPage({ params }: Params) {
 
   if (!project) notFound();
 
+  const techStack = project.techStack ?? [];
+  const summary = project.summary ?? "No summary is available for this project yet.";
+
   return (
-    <main className="bg-[#080808] min-h-screen text-white">
-      {/* Nav */}
-      <div className="max-w-6xl mx-auto px-6 lg:px-8 pt-8">
+    <main
+      className="relative min-h-screen overflow-hidden text-white"
+      style={{ background: "linear-gradient(180deg,#08080f 0%,#0a0a14 55%,#09090f 100%)" }}
+    >
+      <style>{`
+        @keyframes detailScanline {
+          from { transform: translateY(-100%); }
+          to { transform: translateY(100vh); }
+        }
+      `}</style>
+
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(100% 80% at 10% 0%, rgba(124,58,237,0.2) 0%, transparent 58%), radial-gradient(80% 70% at 90% 20%, rgba(99,102,241,0.14) 0%, transparent 60%), radial-gradient(70% 60% at 50% 100%, rgba(124,58,237,0.12) 0%, transparent 62%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px)",
+            backgroundSize: "68px 68px",
+          }}
+        />
+        <div
+          className="absolute left-0 right-0 top-0 h-px"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(124,58,237,0.3), transparent)",
+            animation: "detailScanline 8s linear infinite",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-[0.035] mix-blend-screen"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
+          }}
+        />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-10 lg:px-8 lg:pb-24 lg:pt-14">
         <Link
           href="/projects"
-          className="text-xs font-mono text-zinc-600 hover:text-zinc-400 transition-colors flex items-center gap-2"
+          className="mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-mono uppercase tracking-[0.12em] transition-all duration-300 hover:text-violet-200"
+          style={{
+            color: "#9ca3af",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
         >
-          ← All Projects
+          <span className="text-violet-400">&lt;</span>
+          All projects
         </Link>
-      </div>
 
-      {/* Hero */}
-      <div className="max-w-6xl mx-auto px-6 lg:px-8 py-12 lg:py-20">
-        <div className="flex flex-col gap-5 max-w-3xl">
-          {project.featured && (
-            <span className="text-xs font-mono text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full border border-violet-500/20 w-fit">
-              Featured
-            </span>
-          )}
-          <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight">
-            {project.title}
-          </h1>
-          {project.summary && (
-            <p className="text-zinc-400 text-lg leading-relaxed">{project.summary}</p>
-          )}
-          {project.techStack && project.techStack.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {project.techStack.map((tech) => (
-                <Badge key={tech} label={tech} variant="default" />
-              ))}
+        <section
+          className="relative overflow-hidden rounded-3xl border p-7 lg:p-10"
+          style={{
+            borderColor: "rgba(255,255,255,0.08)",
+            background: "linear-gradient(160deg,rgba(255,255,255,0.035) 0%,rgba(255,255,255,0.02) 100%)",
+            backdropFilter: "blur(16px)",
+            boxShadow: "0 24px 70px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
+          }}
+        >
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
+          <div
+            className="pointer-events-none absolute -top-20 right-0 h-52 w-52 rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)",
+              filter: "blur(28px)",
+            }}
+          />
+
+          <div className="relative">
+            <div className="mb-5 flex flex-wrap items-center gap-2.5">
+              <span className="text-xs font-mono uppercase tracking-[0.3em] text-violet-400">Case Study</span>
+              {project.featured ? (
+                <span
+                  className="rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.12em]"
+                  style={{
+                    color: "#c4b5fd",
+                    background: "rgba(124,58,237,0.2)",
+                    border: "1px solid rgba(124,58,237,0.35)",
+                  }}
+                >
+                  Featured project
+                </span>
+              ) : null}
+            </div>
+
+            <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+              {project.title}
+            </h1>
+            <p className="mt-4 max-w-3xl text-base leading-relaxed text-zinc-400 lg:text-lg">{summary}</p>
+
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              <span
+                className="rounded-full px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.12em]"
+                style={{
+                  color: "#a1a1aa",
+                  background: "rgba(255,255,255,0.035)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                {techStack.length} tech stack
+              </span>
+              <span
+                className="rounded-full px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.12em]"
+                style={{
+                  color: "#a1a1aa",
+                  background: "rgba(255,255,255,0.035)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                demo {project.demoUrl ? "available" : "none"}
+              </span>
+              <span
+                className="rounded-full px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.12em]"
+                style={{
+                  color: "#a1a1aa",
+                  background: "rgba(255,255,255,0.035)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                repository {project.repoUrl ? "available" : "none"}
+              </span>
+            </div>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              {project.demoUrl ? (
+                <Button href={project.demoUrl} target="_blank" rel="noopener noreferrer" variant="primary">
+                  Live Demo -&gt;
+                </Button>
+              ) : null}
+              {project.repoUrl ? (
+                <Button href={project.repoUrl} target="_blank" rel="noopener noreferrer" variant="outline">
+                  GitHub Repo -&gt;
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-8">
+          {project.thumbnail ? (
+            <div
+              className="relative overflow-hidden rounded-3xl border"
+              style={{
+                borderColor: "rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.02)",
+                boxShadow: "0 24px 70px rgba(0,0,0,0.42)",
+              }}
+            >
+              <div className="absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-violet-400/60 to-transparent" />
+              <div className="relative aspect-video w-full">
+                <Image
+                  src={urlFor(project.thumbnail).width(1400).height(788).url()}
+                  alt={project.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 1200px"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+              </div>
+            </div>
+          ) : (
+            <div
+              className="rounded-3xl border px-6 py-16 text-center"
+              style={{
+                borderColor: "rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.02)",
+              }}
+            >
+              <p className="text-sm font-mono text-zinc-400">No preview image available.</p>
             </div>
           )}
-          <div className="flex flex-wrap gap-3 mt-4">
-            {project.demoUrl && (
-              <Button href={project.demoUrl} target="_blank" rel="noopener noreferrer" variant="primary">
-                Live Demo ↗
-              </Button>
-            )}
-            {project.repoUrl && (
-              <Button href={project.repoUrl} target="_blank" rel="noopener noreferrer" variant="outline">
-                GitHub Repo ↗
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Thumbnail */}
-      {project.thumbnail && (
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 pb-16">
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/8">
-            <Image
-              src={urlFor(project.thumbnail).width(1200).height(675).url()}
-              alt={project.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 1200px"
-              priority
-            />
+        <section className="mt-8 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+          <div
+            className="rounded-3xl border p-6 lg:p-8"
+            style={{
+              borderColor: "rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.02)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <p className="text-xs font-mono uppercase tracking-[0.25em] text-violet-400">Overview</p>
+            <p className="mt-4 text-sm leading-relaxed text-zinc-400 lg:text-base">{summary}</p>
           </div>
-        </div>
-      )}
 
-      {/* Divider */}
-      <div className="max-w-6xl mx-auto px-6 lg:px-8 pb-24">
-        <div className="border-t border-white/5 pt-12 flex flex-col gap-4">
-          <p className="text-xs font-mono text-zinc-600 tracking-widest uppercase">Details</p>
-          {project.techStack && project.techStack.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <p className="text-zinc-500 text-sm font-medium">Tech Stack</p>
-              <div className="flex flex-wrap gap-2">
-                {project.techStack.map((tech) => (
+          <div
+            className="rounded-3xl border p-6"
+            style={{
+              borderColor: "rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.02)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <p className="text-xs font-mono uppercase tracking-[0.25em] text-violet-400">Tech Stack</p>
+            {techStack.length > 0 ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {techStack.map((tech) => (
                   <Badge key={tech} label={tech} variant="accent" />
                 ))}
               </div>
-            </div>
-          )}
-        </div>
+            ) : (
+              <p className="mt-4 text-sm text-zinc-500">No stack information provided.</p>
+            )}
+          </div>
+        </section>
       </div>
     </main>
   );

@@ -23,6 +23,7 @@ import Experience from "@/components/sections/Experience";
 import Organizations from "@/components/sections/Organizations";
 import Certificates from "@/components/sections/Certificates";
 import Contact from "@/components/sections/Contact";
+import TopNavbar from "@/components/TopNavbar";
 
 export const revalidate = 60;
 
@@ -45,7 +46,8 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[#080808] text-white">
-      {profile ? <Hero profile={profile} /> : null}
+      <TopNavbar />
+      {profile ? <Hero profile={profile} skills={skills ?? []} /> : null}
       <FeaturedProjects projects={featuredProjects ?? []} />
       <Skills skills={skills ?? []} />
       <Experience experiences={experiences ?? []} />
