@@ -32,6 +32,13 @@ export default async function Home() {
     return (
       <main className="min-h-screen bg-[#080808] text-white">
         <TopNavbar />
+        <section className="mx-auto max-w-6xl px-6 pt-28">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-zinc-300">
+            Data Sanity belum aktif di environment ini. Set
+            {" "}<code className="text-violet-300">NEXT_PUBLIC_SANITY_PROJECT_ID</code> dan{" "}
+            <code className="text-violet-300">NEXT_PUBLIC_SANITY_DATASET</code> di Vercel, lalu redeploy.
+          </div>
+        </section>
         <FeaturedProjects projects={[]} />
         <Skills skills={[]} />
         <Experience experiences={[]} />
