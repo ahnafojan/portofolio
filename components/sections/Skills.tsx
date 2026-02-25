@@ -82,6 +82,13 @@ function CategoryCard({ category, skillList, meta, animDelay }: {
     setTilt({ x, y });
   };
 
+  const cardTransform = hovered
+    ? `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) translateZ(4px)`
+    : "translateY(28px)";
+  const cardTransition = hovered
+    ? "transform 0.15s ease, background 0.3s, border-color 0.3s"
+    : `opacity 0.6s ease ${animDelay}ms, transform 0.6s ease ${animDelay}ms, background 0.3s, border-color 0.3s`;
+
   return (
     <div
       ref={cardRef}
@@ -92,20 +99,16 @@ function CategoryCard({ category, skillList, meta, animDelay }: {
       className="relative rounded-2xl p-6 overflow-hidden cursor-default"
       style={{
         opacity: 0,
-        transform: "translateY(28px)",
-        transition: `opacity 0.6s ease ${animDelay}ms, transform 0.6s ease ${animDelay}ms`,
+        transform: cardTransform,
+        transition: cardTransition,
         background: hovered ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.022)",
         border: `1px solid ${hovered ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)"}`,
         backdropFilter: "blur(16px)",
         transformStyle: "preserve-3d",
         perspective: "1000px",
-        ...(hovered ? {
-          transform: `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) translateZ(4px)`,
-          transition: "transform 0.15s ease, background 0.3s, border-color 0.3s",
-          boxShadow: `0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)`,
-        } : {
-          transition: `opacity 0.6s ease ${animDelay}ms, transform 0.6s ease ${animDelay}ms, background 0.3s, border-color 0.3s`,
-        }),
+        ...(hovered
+          ? { boxShadow: "0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)" }
+          : {}),
       }}
     >
       {/* Hover glow */}
