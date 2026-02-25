@@ -17,7 +17,7 @@ const categoryMeta: Record<string, { icon: string; label: string; accent: string
 const categoryOrder = ["Frontend", "Backend", "Database", "DevOps", "Tools", "Other"];
 
 /* ─── Magnetic skill pill ─── */
-function SkillPill({ name, level }: { name: string; level?: number }) {
+function SkillPill({ name }: { name: string }) {
   const ref = useRef<HTMLSpanElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLSpanElement>) => {
@@ -36,8 +36,6 @@ function SkillPill({ name, level }: { name: string; level?: number }) {
     }
   };
 
-  const isHighLevel = level && level >= 4;
-
   return (
     <span
       ref={ref}
@@ -46,18 +44,17 @@ function SkillPill({ name, level }: { name: string; level?: number }) {
       className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full cursor-default select-none"
       style={{
         transition: "transform 0.2s cubic-bezier(0.16,1,0.3,1), background 0.2s, border-color 0.2s, color 0.2s",
-        background: isHighLevel ? "rgba(124,58,237,0.14)" : "rgba(255,255,255,0.045)",
-        border: `1px solid ${isHighLevel ? "rgba(167,139,250,0.3)" : "rgba(255,255,255,0.08)"}`,
-        color: isHighLevel ? "#c4b5fd" : "#9ca3af",
+        background: "rgba(255,255,255,0.045)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        color: "#9ca3af",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget;
-        el.style.background = isHighLevel ? "rgba(124,58,237,0.22)" : "rgba(255,255,255,0.07)";
-        el.style.borderColor = isHighLevel ? "rgba(167,139,250,0.5)" : "rgba(255,255,255,0.15)";
+        el.style.background = "rgba(255,255,255,0.07)";
+        el.style.borderColor = "rgba(255,255,255,0.15)";
         el.style.color = "#fff";
       }}
     >
-      {isHighLevel && <span style={{ color: "#7c3aed", fontSize: "8px" }}>★</span>}
       {name}
     </span>
   );
@@ -152,7 +149,7 @@ function CategoryCard({ category, skillList, meta, animDelay }: {
       {/* Skills */}
       <div className="relative flex flex-wrap gap-2">
         {skillList.map((skill) => (
-          <SkillPill key={skill._id} name={skill.name} level={skill.level} />
+          <SkillPill key={skill._id} name={skill.name} />
         ))}
       </div>
 

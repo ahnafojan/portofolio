@@ -81,6 +81,7 @@ export type Certificate = {
   credentialUrl?: string;
   credentialId?: string;
   skills?: string[];
-  logo?: any; // kalau kamu sudah punya type image, boleh rapihin
+  logo?: SanityImage;
+  logos?: SanityImage[];
   order?: number;
 };

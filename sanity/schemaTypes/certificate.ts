@@ -23,8 +23,21 @@ export default defineType({
       of: [{ type: "string" }],
     }),
     defineField({
+      name: "logos",
+      title: "Logos",
+      description: "Bisa upload lebih dari satu logo/gambar sertifikat.",
+      type: "array",
+      of: [
+        {
+          type: "image",
+          options: { hotspot: true },
+        },
+      ],
+    }),
+    defineField({
       name: "logo",
-      title: "Logo",
+      title: "Legacy Logo (Single)",
+      description: "Field lama. Gunakan Logos untuk input baru.",
       type: "image",
       options: { hotspot: true },
     }),

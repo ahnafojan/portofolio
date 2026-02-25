@@ -70,5 +70,5 @@ export const ORGANIZATIONS_QUERY = `*[_type == "organization"] | order(order des
 }`;
 
 export const CERTIFICATES_QUERY = `*[_type == "certificate"] | order(order desc, _createdAt desc){
-  _id, title, issuer, issueDate, expiryDate, credentialUrl, credentialId, skills, logo, order
+  _id, title, issuer, issueDate, expiryDate, credentialUrl, credentialId, skills, logos, logo, order
 }`;
