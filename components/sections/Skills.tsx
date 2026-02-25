@@ -16,6 +16,12 @@ const categoryMeta: Record<string, { icon: string; label: string; accent: string
 
 const categoryOrder = ["Frontend", "Backend", "Database", "DevOps", "Tools", "Other"];
 
+function normalizeLevel(level: Skill["level"]) {
+  const parsed = Number(level);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.max(1, Math.min(5, parsed));
+}
+
 /* ─── Magnetic skill pill ─── */
 function SkillPill({ name }: { name: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -85,6 +91,14 @@ function CategoryCard({ category, skillList, meta, animDelay }: {
   const cardTransition = hovered
     ? "transform 0.15s ease, background 0.3s, border-color 0.3s"
     : `opacity 0.6s ease ${animDelay}ms, transform 0.6s ease ${animDelay}ms, background 0.3s, border-color 0.3s`;
+  const hasLevelData = skillList.some((skill) => normalizeLevel(skill.level) !== null);
+  const advancedCount = hasLevelData
+    ? skillList.filter((skill) => {
+        const level = normalizeLevel(skill.level);
+        return level !== null && level >= 4;
+      }).length
+    : skillList.length;
+  const advancedRatio = skillList.length > 0 ? (advancedCount / skillList.length) * 100 : 0;
 
   return (
     <div
@@ -159,14 +173,14 @@ function CategoryCard({ category, skillList, meta, animDelay }: {
         <div
           className="h-full rounded-full transition-all duration-1000"
           style={{
-            width: hovered ? `${Math.min(100, (skillList.filter(s => s.level && s.level >= 4).length / skillList.length) * 100)}%` : "0%",
+            width: hovered ? `${Math.min(100, advancedRatio)}%` : "0%",
             background: `linear-gradient(90deg,${meta.accent}80,${meta.accent})`,
             boxShadow: hovered ? `0 0 8px ${meta.accent}60` : "none",
           }}
         />
       </div>
       <p className="mt-1.5 text-[10px] font-mono" style={{ color: "#374151" }}>
-        {skillList.filter(s => s.level && s.level >= 4).length} advanced
+        {advancedCount} advanced
       </p>
     </div>
   );

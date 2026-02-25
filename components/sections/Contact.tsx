@@ -217,20 +217,24 @@ export default function Contact({ profile }: ContactProps) {
         </div>
 
         {/* Footer */}
-        <div
-          data-anim
-          className="mt-14 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between"
-          style={{ opacity: 0, transform: "translateY(10px)", transition: "opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s" }}
-        >
-          <p className="text-xs font-mono" style={{ color: "#1f2937" }}>
-            {profile?.fullName ?? "Portfolio"} © {new Date().getFullYear()}
-          </p>
-          <div className="h-px flex-1 mx-8 hidden sm:block"
-            style={{ background: "rgba(255,255,255,0.03)" }} />
-          <p className="text-xs font-mono" style={{ color: "#1f2937" }}>
-            Built with Next.js &amp; Sanity
-          </p>
-        </div>
+       <div
+  data-anim
+  className="mt-14 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-center"
+  style={{ 
+    opacity: 0, 
+    transform: "translateY(10px)", 
+    transition: "opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s" 
+  }}
+>
+  <p className="w-full text-xs font-mono text-center" style={{ color: "#1f2937" }}>
+    {profile?.fullName ?? "Portfolio"} © {new Date().getFullYear()}
+  </p>
+
+  <div 
+    className="h-px flex-1 hidden sm:block"
+    style={{ background: "rgba(255,255,255,0.03)" }} 
+  />
+</div>
       </div>
     </section>
   );
