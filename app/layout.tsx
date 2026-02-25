@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     template: "%s — Portfolio",
   },
   description: "Personal portfolio",
+  icons: {
+    icon: "/logoahnaf.png",
+    shortcut: "/logoahnaf.png",
+    apple: "/logoahnaf.png",
+  },
 };
 
 export default function RootLayout({
